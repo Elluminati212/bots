@@ -203,11 +203,11 @@
             let botReply = `✅ ${data.message}`;
 
             if (data.filename) {
-              botReply += `<br><a class="download-button" href="http://localhost:8000/download/${data.filename}" target="_blank" download>📥 Download ${data.filename}</a>`;
+              botReply += `<br><a class="download-button" href="http://localhost:5558/download/${data.filename}" target="_blank" download>📥 Download ${data.filename}</a>`;
             }
 
             if (data.audio_file) {
-              botReply += `<br><a class="download-button" href="http://localhost:8000/download/${data.audio_file}" target="_blank" download>🎧 Download Podcast Audio</a>`;
+              botReply += `<br><a class="download-button" href="http://localhost:5558/download/${data.audio_file}" target="_blank" download>🎧 Download Podcast Audio</a>`;
             }
 
             chatLog.innerHTML += `<div class="bot-message">${botReply}</div>`;
