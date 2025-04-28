@@ -110,8 +110,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-UPLOAD_FOLDER = "/home/vasu/bots/uploads"
-RESULT_FOLDER = "/home/vasu/bots/results"
+UPLOAD_FOLDER = "/var/www/html/bot/bots/uploads"
+RESULT_FOLDER = "/var/www/html/bot/bots/results"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
