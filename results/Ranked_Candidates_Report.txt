@@ -1,0 +1,12 @@
+After analyzing the resumes, I have ranked them based on their relevance to the Job Description (JD). Here is the ranking list of the top 3 candidates:
+
+1. Candidate 1: Relevance Score: 92/100
+Insight: Kalaivani S has an impressive background in content writing, with 5 years of experience in SEO content writing, and a strong understanding of content strategy. Her skills in content creation, editing, and proofreading, along with her experience in keyword research and SEO optimization, make her a strong match for the JD.
+
+2. Candidate 3: Relevance Score: 88/100
+Insight: Sanchita Chowdhury has 7+ years of experience in technical content writing, with a strong focus on SEO optimization and content strategy. Her skills in adapting writing styles for diverse industries, conducting in-depth research, and enhancing brand visibility align well with the JD's requirements.
+
+3. Candidate 4: Relevance Score: 84/100
+Insight: Mansi Padwani has a strong educational background in English Literature and has worked as a content writer for multiple brands. Her skills in attention to detail, creativity, and critical thinking, along with her experience in writing engaging content, make her a suitable candidate for the JD.
+
+Note: The relevance scores are based on the candidate's experience, skills, and education, and how well they align with the requirements mentioned in the Job Description.
