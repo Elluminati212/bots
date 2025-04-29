@@ -7,4 +7,5 @@ uvicorn
 fastapi
 pydub
 python-multipart
-pip install pymupdf
+pymupdf
+scipy

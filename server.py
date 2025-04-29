@@ -1,14 +1,25 @@
 # import os
 # import shutil
 # import uvicorn
+# from groq import Groq
 # from datetime import datetime
 # from fastapi.middleware.cors import CORSMiddleware
 # from fastapi import FastAPI, UploadFile, File, Form
 # from fastapi.responses import FileResponse, JSONResponse
 
+# # === SETTINGS ===
+# UPLOAD_FOLDER = "/home/vasu/bots/uploads"
+# RESULT_FOLDER = "/home/vasu/bots/results"
+# GROQ_API_KEY = os.getenv("GROQ_API_KEY", "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")
+# DEFAULT_MODEL = "llama3-70b-8192"
+
+# # === INITIAL SETUP ===
+# os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# os.makedirs(RESULT_FOLDER, exist_ok=True)
+
 # app = FastAPI()
 
-# # Enable CORS for frontend
+# # Enable CORS
 # app.add_middleware(
 #     CORSMiddleware,
 #     allow_origins=["*"],
@@ -17,80 +28,113 @@
 #     allow_headers=["*"],
 # )
 
-# UPLOAD_FOLDER = "/home/vasu/bots/uploads"
-# RESULT_FOLDER = "/home/vasu/bots/results"
+# # === GROQ CLIENT ===
+# client = Groq(api_key=GROQ_API_KEY)
 
-# os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-# os.makedirs(RESULT_FOLDER, exist_ok=True)
+# def generate_text(prompt, model=DEFAULT_MODEL, temperature=0.7, max_tokens=1024):
+#     try:
+#         response = client.chat.completions.create(
+#             model=model,
+#             messages=[
+#                 {"role": "system", "content": "You are a helpful assistant."},
+#                 {"role": "user", "content": prompt},
+#             ],
+#             temperature=temperature,
+#             max_tokens=max_tokens,
+#             top_p=1,
+#             stream=False
+#         )
+#         return response.choices[0].message.content
+#     except Exception as e:
+#         print(f"Groq API Error: {e}")
+#         return None
 
-# # BLOG WRITER
+# # === HELPERS ===
+# def save_text_to_file(text, path):
+#     with open(path, "w") as f:
+#         f.write(text)
+
+# # === ENDPOINTS ===
+
+# # --- Blog Writer ---
 # @app.post("/blog")
 # async def blog_writer(topic: str = Form(...), keywords: str = Form(""), tone: str = Form(""), length: int = Form(1000)):
 #     try:
-#         from BlogWriter import query_groq_llm, save_blog_to_file
-#         keywords_list = [k.strip() for k in keywords.split(',')] if keywords else []
-#         blog_text = query_groq_llm(topic, keywords_list, tone, length)
+#         prompt = f"Write a {tone} blog about '{topic}'. Include keywords: {keywords}. Target length: {length} words."
+#         blog_text = generate_text(prompt)
 #         if blog_text:
 #             filename = f"{topic.replace(' ', '_')}_blog.txt"
-#             save_blog_to_file(blog_text, os.path.join(RESULT_FOLDER, filename))
+#             save_text_to_file(blog_text, os.path.join(RESULT_FOLDER, filename))
 #             return {"filename": filename, "message": "Blog created successfully"}
+#         else:
+#             raise Exception("No response from Groq API.")
 #     except Exception as e:
 #         return JSONResponse(status_code=500, content={"message": f"Error: {str(e)}"})
-#     return JSONResponse(status_code=500, content={"message": "Blog generation failed"})
 
-# # RESUME RANKER
+# # --- News Aggregator ---
+# @app.post("/news")
+# async def news_aggregator(topic: str = Form(...)):
+#     try:
+#         prompt = f"Summarize the latest news on: {topic}. Provide a short digest."
+#         news_text = generate_text(prompt)
+#         if news_text:
+#             today_date = datetime.now().strftime("%Y-%m-%d")
+#             filename = f"{topic.replace(' ', '_').lower()}_news_digest_{today_date}.txt"
+#             save_text_to_file(news_text, os.path.join(RESULT_FOLDER, filename))
+#             return {"filename": filename, "message": "News digest created successfully"}
+#         else:
+#             raise Exception("No response from Groq API.")
+#     except Exception as e:
+#         return JSONResponse(status_code=500, content={"message": f"Error: {str(e)}"})
+
+# # --- Podcast Creator ---
+# @app.post("/podcast")
+# async def podcast_creator(topic: str = Form(...), length_choice: int = Form(5)):
+#     try:
+#         prompt = f"Create a podcast script about '{topic}' that can be spoken in about {length_choice} minutes."
+#         script_text = generate_text(prompt)
+#         if script_text:
+#             safe_topic = topic.replace(' ', '_')
+#             filename = f"{safe_topic}_podcast_script.txt"
+#             save_text_to_file(script_text, os.path.join(RESULT_FOLDER, filename))
+#             return {"filename": filename, "message": "Podcast script created successfully"}
+#         else:
+#             raise Exception("No response from Groq API.")
+#     except Exception as e:
+#         return JSONResponse(status_code=500, content={"message": f"Error: {str(e)}"})
+
+# # --- Resume Ranker Dummy (Still from your system) ---
 # @app.post("/resume")
 # async def resume_ranker(top_n: int = Form(...)):
 #     try:
 #         from HRResumeRanker import main as hr_main
-#         hr_main()
-#         return {"message": "Resumes ranked successfully. Check results folder."}
+#         hr_main(top_n)
+#         return {"message": "Resumes ranked successfully. Check results folder.", "filename": "Ranked_Candidates_Report.txt"}
 #     except Exception as e:
 #         return JSONResponse(status_code=500, content={"message": f"Error: {str(e)}"})
 
-# # NEWS AGGREGATOR
-# @app.post("/news")
-# async def news_aggregator(topic: str = Form(...)):
-#     try:
-#         from LatestNewsAggregator import query_groq_llm, save_news_to_file
-#         news_text = query_groq_llm(topic)
-#         if news_text:
-#             today_date = datetime.now().strftime("%Y-%m-%d")
-#             safe_topic = topic.replace(' ', '_').lower()
-#             filename = f"{safe_topic}_news_digest_{today_date}.txt"
-#             save_news_to_file(news_text, os.path.join(RESULT_FOLDER, filename))
-#             return {"filename": filename, "message": "News summary created"}
-#     except Exception as e:
-#         return JSONResponse(status_code=500, content={"message": f"Error: {str(e)}"})
-#     return JSONResponse(status_code=500, content={"message": "News aggregation failed"})
+# # --- Upload Files ---
+# @app.post("/upload/")
+# async def upload_file(file: UploadFile = File(...)):
+#     file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+#     with open(file_path, "wb") as f:
+#         shutil.copyfileobj(file.file, f)
+#     return {"filename": file.filename, "message": "File uploaded successfully"}
 
-# # PODCAST CREATOR
-# @app.post("/podcast")
-# async def podcast_creator(topic: str = Form(...), length_choice: int = Form(5)):
-#     try:
-#         from PodcastCreator import query_groq_llm, generate_audio, save_blog_to_file
-#         blog_text = query_groq_llm(topic, length_choice)
-#         if blog_text:
-#             safe_topic = topic.replace(' ', '_')
-#             blog_filename = f"{safe_topic}_blog.txt"
-#             audio_mp3_filename = f"{safe_topic}_podcast.mp3"
-#             audio_wav_filename = f"{safe_topic}_podcast.wav"
-#             save_blog_to_file(blog_text, os.path.join(RESULT_FOLDER, blog_filename))
-#             generate_audio(blog_text, os.path.join(RESULT_FOLDER, audio_mp3_filename), os.path.join(RESULT_FOLDER, audio_wav_filename))
-#             return {
-#                 "blog_file": blog_filename,
-#                 "audio_file": audio_wav_filename,
-#                 "message": "Podcast created successfully"
-#             }
-#     except Exception as e:
-#         return JSONResponse(status_code=500, content={"message": f"Error: {str(e)}"})
-#     return JSONResponse(status_code=500, content={"message": "Podcast creation failed"})
+# # --- Download Files ---
+# @app.get("/download/{filename}")
+# async def download_file(filename: str):
+#     file_path = os.path.join(RESULT_FOLDER, filename)
+#     if os.path.exists(file_path):
+#         return FileResponse(path=file_path, filename=filename, media_type='application/octet-stream')
+#     else:
+#         return JSONResponse(status_code=404, content={"message": "File not found"})
 
+# # === START SERVER ===
 # if __name__ == "__main__":
 #     uvicorn.run(app, host="0.0.0.0", port=8000)
 
-
-
+#______________________________________________________________________________________________________________________________________________________________
 import os
 import shutil
 import uvicorn
@@ -98,6 +142,7 @@ from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import FileResponse, JSONResponse
+from TTSAgent import query_groq_llm, transcribe_audio, speak_text
 
 app = FastAPI()
 
@@ -109,12 +154,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 UPLOAD_FOLDER = "/home/vasu/bots/uploads"
 RESULT_FOLDER = "/home/vasu/bots/results"
+AUDIO_FOLDER = "/home/vasu/bots/audio"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
+os.makedirs(AUDIO_FOLDER, exist_ok=True)
 
 # BLOG WRITER
 @app.post("/blog")
@@ -180,6 +226,24 @@ async def podcast_creator(topic: str = Form(...), length_choice: int = Form(5)):
         return JSONResponse(status_code=500, content={"message": f"Error: {str(e)}"})
     return JSONResponse(status_code=500, content={"message": "Podcast creation failed"})
 
+@app.post("/voicechat")
+async def voice_chat(file: UploadFile = File(...)):
+    try:
+        temp_path = os.path.join(AUDIO_FOLDER, file.filename)
+        with open(temp_path, "wb") as f:
+            shutil.copyfileobj(file.file, f)
+
+        question = transcribe_audio(temp_path)
+        answer = query_groq_llm(question)
+        
+        speak_text(answer)
+        os.remove(temp_path)
+
+        return {"question": question, "answer": answer}
+
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"message": f"Error: {str(e)}"})
+
 # UPLOAD files (for JD and resumes)
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...)):
@@ -200,3 +264,5 @@ async def download_file(filename: str):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+

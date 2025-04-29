@@ -1,225 +1,264 @@
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Agent Chatbot Suite</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: #f4f7f8;
-        margin: 0;
-        padding: 0;
-      }
-      .header {
-        background: #4caf50;
-        padding: 20px;
-        color: white;
-        text-align: center;
-      }
-      .chat-container {
-        display: flex;
-        flex-direction: column;
-        max-width: 800px;
-        margin: 20px auto;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-      }
-      .chat-log {
-        padding: 20px;
-        height: 400px;
-        overflow-y: auto;
-        border-bottom: 1px solid #ddd;
-      }
-      .chat-log div {
-        margin: 10px 0;
-      }
-      .user-message {
-        text-align: right;
-        color: #333;
-      }
-      .bot-message {
-        text-align: left;
-        color: #4caf50;
-      }
-      .chat-controls {
-        display: flex;
-        padding: 10px;
-        background: #f0f0f0;
-      }
-      .chat-controls select,
-      .chat-controls input,
-      .chat-controls button {
-        margin-right: 10px;
-        padding: 10px;
-        border: none;
-        border-radius: 4px;
-      }
-      .chat-controls input {
-        flex: 1;
-      }
-      .chat-controls button {
-        background: #4caf50;
-        color: white;
-        cursor: pointer;
-      }
-      .chat-controls button:hover {
-        background: #45a049;
-      }
-      .download-button {
-        display: inline-block;
-        margin-top: 8px;
-        padding: 8px 15px;
-        background-color: #4caf50;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-      }
-      .download-button:hover {
-        background-color: #45a049;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="header">
-      <h1>Agent Chatbot Suite 🤖</h1>
-      <p>Select your agent and start chatting!</p>
-    </div>
+<head>
+  <meta charset="UTF-8" />
+  <title>Agent Chatbot Suite</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7f8;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background: #4B0082;
+      padding: 20px;
+      color: white;
+      text-align: center;
+    }
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .chat-log {
+      padding: 20px;
+      height: 400px;
+      overflow-y: auto;
+      border-bottom: 1px solid #ddd;
+    }
+    .chat-log div {
+      margin: 10px 0;
+    }
+    .user-message {
+      text-align: right;
+      color: #333;
+    }
+    .bot-message {
+      text-align: left;
+      color: #8446be;
+    }
+    .chat-controls {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 10px;
+      background: #f0f0f0;
+    }
+    .chat-controls select,
+    .chat-controls input,
+    .chat-controls button {
+      margin: 5px;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+    }
+    .chat-controls input {
+      flex: 1;
+    }
+    .chat-controls button {
+      background: #4caf50;
+      color: white;
+      cursor: pointer;
+    }
+    .chat-controls button:hover {
+      background: #45a049;
+    }
+    .download-button {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 8px 15px;
+      background-color: #4caf50;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .download-button:hover {
+      background-color: #45a049;
+    }
+    #uploadArea {
+      width: 100%;
+      margin-top: 10px;
+    }
+  </style>
+</head>
 
-    <div class="chat-container">
-      <div class="chat-log" id="chatLog">
-        <div class="bot-message">
-          👋 Hi! I'm your AI Agent. Select an agent below and ask me anything!
-        </div>
-      </div>
-      <div class="chat-controls">
-        <select id="agentSelect" onchange="renderForm()">
-          <option value="podcast">🎙️ Podcast Creator</option>
-          <option value="blog">📝 Blog Writer</option>
-          <option value="resume">📄 Resume Ranker</option>
-          <option value="news">🗞️ News Aggregator</option>
-        </select>
+<body>
+  <div class="header">
+    <h1>Agent Suite 🤖</h1>
+    <p>Select your agent and get started</p>
+  </div>
 
-        <input type="text" id="userInput" placeholder="Type your message..." />
-
-        <div id="uploadArea" style="display: none">
-          <input type="file" id="jdFile" accept=".txt" /><br /><br />
-          <input
-            type="file"
-            id="resumesFile"
-            accept=".pdf"
-            multiple
-          /><br /><br />
-          <input
-            type="number"
-            id="topNCandidates"
-            placeholder="How many top candidates? (e.g., 5)"
-          /><br /><br />
-        </div>
-
-        <button onclick="sendMessage()">Send</button>
+  <div class="chat-container">
+    <div class="chat-log" id="chatLog">
+      <div class="bot-message">
+        👋 Hi! I'm your AI Agent. Select an agent below and complete your task, or click Mic 🎤 to talk!
       </div>
     </div>
 
-    <script>
-      function renderForm() {
-        const agent = document.getElementById("agentSelect").value;
-        const uploadArea = document.getElementById("uploadArea");
-        const userInput = document.getElementById("userInput");
+    <div class="chat-controls">
+      <select id="agentSelect" onchange="renderForm()">
+        <option value="podcast">🎙️ Podcast Creator</option>
+        <option value="blog">📝 Blog Writer</option>
+        <option value="resume">📄 Resume Ranker</option>
+        <option value="news">🗞️ News Aggregator</option>
+      </select>
 
-        if (agent === "resume") {
-          uploadArea.style.display = "block";
-          userInput.style.display = "none";
-        } else {
-          uploadArea.style.display = "none";
-          userInput.style.display = "block";
-        }
+      <input type="text" id="userInput" placeholder="Type your message..." />
+      <button onclick="sendMessage()">Send</button>
+      <button onclick="startRecording()">🎤 Mic</button>
+
+      <div id="uploadArea" style="display: none">
+        <input type="file" id="jdFile" accept=".txt" /><br /><br />
+        <input type="file" id="resumesFile" accept=".pdf" multiple /><br /><br />
+        <input type="number" id="topNCandidates" placeholder="Top candidates (e.g., 5)" /><br /><br />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function renderForm() {
+      const agent = document.getElementById("agentSelect").value;
+      const uploadArea = document.getElementById("uploadArea");
+      const userInput = document.getElementById("userInput");
+
+      if (agent === "resume") {
+        uploadArea.style.display = "block";
+        userInput.style.display = "none";
+      } else {
+        uploadArea.style.display = "none";
+        userInput.style.display = "block";
+      }
+    }
+
+    async function sendMessage() {
+      const agent = document.getElementById("agentSelect").value;
+      const userInputValue = document.getElementById("userInput").value.trim();
+      const chatLog = document.getElementById("chatLog");
+
+      if (!userInputValue && agent !== "resume") {
+        chatLog.innerHTML += `<div class="bot-message">❌ Please enter a message!</div>`;
+        return;
       }
 
-      async function sendMessage() {
-        const agent = document.getElementById("agentSelect").value;
-        const userInput = document.getElementById("userInput").value.trim();
-        const chatLog = document.getElementById("chatLog");
+      chatLog.innerHTML += `<div class="user-message">${userInputValue}</div>`;
 
-        chatLog.innerHTML += `<div class="user-message">${userInput}</div>`;
+      let url = `http://localhost:8000/${agent}`;
+      let formData = new FormData();
 
-        let url = `http://localhost:8000/${agent}`;
-        let formData = new FormData();
+      if (agent === "blog" || agent === "news" || agent === "podcast") {
+        formData.append("topic", userInputValue);
+        if (agent === "blog") {
+          formData.append("keywords", "");
+          formData.append("tone", "friendly");
+          formData.append("length", 1000);
+        }
+        if (agent === "podcast") {
+          formData.append("length_choice", 5);
+        }
+      } else if (agent === "resume") {
+        const jdFileInput = document.getElementById("jdFile");
+        const resumesFileInput = document.getElementById("resumesFile");
+        const topNInput = document.getElementById("topNCandidates");
 
-        if (agent === "blog" || agent === "news" || agent === "podcast") {
-          formData.append("topic", userInput);
-          if (agent === "blog") {
-            formData.append("keywords", "");
-            formData.append("tone", "friendly");
-            formData.append("length", 1000);
-          }
-          if (agent === "podcast") {
-            formData.append("length_choice", 5);
-          }
-        } else if (agent === "resume") {
-          const jdFileInput = document.getElementById("jdFile");
-          const resumesFileInput = document.getElementById("resumesFile");
-          const topNInput = document.getElementById("topNCandidates");
-
-          if (!jdFileInput.files.length || !resumesFileInput.files.length) {
-            chatLog.innerHTML += `<div class="bot-message">❌ Please upload JD and at least 1 Resume!</div>`;
-            return;
-          }
-          if (!topNInput.value) {
-            chatLog.innerHTML += `<div class="bot-message">❌ Please enter how many top candidates to shortlist!</div>`;
-            return;
-          }
-
-          // Upload JD first
-          const jdFormData = new FormData();
-          jdFormData.append("file", jdFileInput.files[0]);
-          await fetch("http://localhost:8000/upload/", {
-            method: "POST",
-            body: jdFormData,
-          });
-
-          // Upload all resumes
-          for (let i = 0; i < resumesFileInput.files.length; i++) {
-            const resumeFormData = new FormData();
-            resumeFormData.append("file", resumesFileInput.files[i]);
-            await fetch("http://localhost:8000/upload/", {
-              method: "POST",
-              body: resumeFormData,
-            });
-          }
-
-          // Now call resume ranker
-          formData.append("top_n", topNInput.value);
+        if (!jdFileInput.files.length || !resumesFileInput.files.length) {
+          chatLog.innerHTML += `<div class="bot-message">❌ Please upload JD and at least one Resume!</div>`;
+          return;
+        }
+        if (!topNInput.value) {
+          chatLog.innerHTML += `<div class="bot-message">❌ Please enter number of top candidates!</div>`;
+          return;
         }
 
-        fetch(url, {
-          method: "POST",
-          body: formData,
+        // Upload JD
+        const jdFormData = new FormData();
+        jdFormData.append("file", jdFileInput.files[0]);
+        await fetch("http://localhost:8000/upload/", { method: "POST", body: jdFormData });
+
+        // Upload resumes
+        for (let i = 0; i < resumesFileInput.files.length; i++) {
+          const resumeFormData = new FormData();
+          resumeFormData.append("file", resumesFileInput.files[i]);
+          await fetch("http://localhost:8000/upload/", { method: "POST", body: resumeFormData });
+        }
+
+        formData.append("top_n", topNInput.value);
+      }
+
+      fetch(url, { method: "POST", body: formData })
+        .then(response => response.json())
+        .then(data => {
+          let botReply = `✅ ${data.message}`;
+
+          if (data.filename) {
+            botReply += `<br><a class="download-button" href="http://localhost:8000/download/${data.filename}" target="_blank" download>📥 Download ${data.filename}</a>`;
+          }
+          if (data.audio_file) {
+            botReply += `<br><a class="download-button" href="http://localhost:8000/download/${data.audio_file}" target="_blank" download>🎧 Download Podcast Audio</a>`;
+          }
+
+          chatLog.innerHTML += `<div class="bot-message">${botReply}</div>`;
+          chatLog.scrollTop = chatLog.scrollHeight;
         })
-          .then((response) => response.json())
-          .then((data) => {
-            let botReply = `✅ ${data.message}`;
+        .catch(error => {
+          chatLog.innerHTML += `<div class="bot-message">❌ Error: ${error}</div>`;
+          chatLog.scrollTop = chatLog.scrollHeight;
+        });
 
-            if (data.filename) {
-              botReply += `<br><a class="download-button" href="http://localhost:8000/download/${data.filename}" target="_blank" download>📥 Download ${data.filename}</a>`;
-            }
+      document.getElementById("userInput").value = "";
+    }
 
-            if (data.audio_file) {
-              botReply += `<br><a class="download-button" href="http://localhost:8000/download/${data.audio_file}" target="_blank" download>🎧 Download Podcast Audio</a>`;
-            }
+    // 🎤 Microphone recording feature
+    let mediaRecorder;
+    let audioChunks = [];
 
-            chatLog.innerHTML += `<div class="bot-message">${botReply}</div>`;
-            chatLog.scrollTop = chatLog.scrollHeight;
-          })
-          .catch((error) => {
-            chatLog.innerHTML += `<div class="bot-message">❌ Error: ${error}</div>`;
-            chatLog.scrollTop = chatLog.scrollHeight;
+    function startRecording() {
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.start();
+          audioChunks = [];
+
+          mediaRecorder.addEventListener("dataavailable", event => {
+            audioChunks.push(event.data);
           });
 
-        document.getElementById("userInput").value = "";
-      }
-    </script>
-  </body>
+          mediaRecorder.addEventListener("stop", () => {
+            const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+            const formData = new FormData();
+            formData.append("file", audioBlob, "recorded.wav");
+
+            fetch("http://localhost:8000/voicechat", {
+              method: "POST",
+              body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+              const chatLog = document.getElementById("chatLog");
+              chatLog.innerHTML += `<div class="user-message">🎤 ${data.question}</div>`;
+              chatLog.innerHTML += `<div class="bot-message">🤖 ${data.answer}</div>`;
+              chatLog.scrollTop = chatLog.scrollHeight;
+            })
+            .catch(error => {
+              const chatLog = document.getElementById("chatLog");
+              chatLog.innerHTML += `<div class="bot-message">❌ Mic Error: ${error}</div>`;
+            });
+          });
+
+          setTimeout(() => {
+            mediaRecorder.stop();
+          }, 5000); // Auto-stop after 5 seconds
+        })
+        .catch(error => {
+          alert("Microphone access denied or error: " + error);
+        });
+    }
+  </script>
+</body>
 </html>
