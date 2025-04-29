@@ -8,4 +8,7 @@ fastapi
 pydub
 python-multipart
 pymupdf
+<<<<<<< HEAD
 scipy
+=======
+>>>>>>> 5d48a1f16904b5450d6b51840ce5337ec422bc92

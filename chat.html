@@ -211,12 +211,22 @@
           chatLog.scrollTop = chatLog.scrollHeight;
         });
 
+<<<<<<< HEAD
       document.getElementById("userInput").value = "";
     }
 
     // 🎤 Microphone recording feature
     let mediaRecorder;
     let audioChunks = [];
+=======
+            if (data.filename) {
+              botReply += `<br><a class="download-button" href="http://localhost:5558/download/${data.filename}" target="_blank" download>📥 Download ${data.filename}</a>`;
+            }
+
+            if (data.audio_file) {
+              botReply += `<br><a class="download-button" href="http://localhost:5558/download/${data.audio_file}" target="_blank" download>🎧 Download Podcast Audio</a>`;
+            }
+>>>>>>> 5d48a1f16904b5450d6b51840ce5337ec422bc92
 
     function startRecording() {
       navigator.mediaDevices.getUserMedia({ audio: true })
