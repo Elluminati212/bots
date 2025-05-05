@@ -8,7 +8,13 @@ fastapi
 pydub
 python-multipart
 pymupdf
-<<<<<<< HEAD
 scipy
-=======
->>>>>>> 5d48a1f16904b5450d6b51840ce5337ec422bc92
+langchain 
+faiss-cpu 
+sentence-transformers
+edge-tts 
+numpy 
+whisper 
+pygame
+gtts
+TTS

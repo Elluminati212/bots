@@ -17,9 +17,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-UPLOAD_FOLDER = "/home/vasu/bots/uploads"
-RESULT_FOLDER = "/home/vasu/bots/results"
-AUDIO_FOLDER = "/home/vasu/bots/audio"
+UPLOAD_FOLDER = "/home/elluminati/bots/uploads"
+RESULT_FOLDER = "/home/elluminati/bots/results"
+AUDIO_FOLDER = "/home/elluminati/bots/audio"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)

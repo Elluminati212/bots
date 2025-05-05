@@ -1,4 +1,4 @@
-
+<!-- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -264,6 +264,674 @@
           setTimeout(() => {
             mediaRecorder.stop();
           }, 5000); // Auto-stop after 5 seconds
+        })
+        .catch(error => {
+          alert("Microphone access denied or error: " + error);
+        });
+    }
+  </script>
+</body>
+</html> -->
+<!-- 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Agent Chatbot Suite</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7f8;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background: #4B0082;
+      padding: 20px;
+      color: white;
+      text-align: center;
+    }
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .chat-log {
+      padding: 20px;
+      height: 400px;
+      overflow-y: auto;
+      border-bottom: 1px solid #ddd;
+    }
+    .chat-log div {
+      margin: 10px 0;
+    }
+    .user-message {
+      text-align: right;
+      color: #333;
+    }
+    .bot-message {
+      text-align: left;
+      color: #8446be;
+    }
+    .chat-controls {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 10px;
+      background: #f0f0f0;
+    }
+    .chat-controls select,
+    .chat-controls input,
+    .chat-controls button {
+      margin: 5px;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+    }
+    .chat-controls input {
+      flex: 1;
+    }
+    .chat-controls button {
+      background: #4caf50;
+      color: white;
+      cursor: pointer;
+    }
+    .chat-controls button:hover {
+      background: #45a049;
+    }
+    .download-button {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 8px 15px;
+      background-color: #4caf50;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .download-button:hover {
+      background-color: #45a049;
+    }
+    #uploadArea {
+      width: 100%;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1>Agent Suite 🤖</h1>
+    <p>Select your agent and get started</p>
+  </div>
+
+  <div class="chat-container">
+    <div class="chat-log" id="chatLog">
+      <div class="bot-message">
+        👋 Hi! I'm your AI Agent. Select an agent below and complete your task, or click Mic 🎤 to talk!
+      </div>
+    </div>
+
+    <div class="chat-controls">
+      <select id="agentSelect" onchange="renderForm()">
+        <option value="podcast">🎙️ Podcast Creator</option>
+        <option value="blog">📝 Blog Writer</option>
+        <option value="resume">📄 Resume Ranker</option>
+        <option value="news">🗞️ News Aggregator</option>
+      </select>
+
+      <input type="text" id="userInput" placeholder="Type your message..." />
+      <button onclick="sendMessage()">Send</button>
+      <button onclick="startRecording()">🎤 Mic</button>
+
+      <div id="uploadArea" style="display: none">
+        <input type="file" id="jdFile" accept=".txt" /><br /><br />
+        <input type="file" id="resumesFile" accept=".pdf" multiple /><br /><br />
+        <input type="number" id="topNCandidates" placeholder="Top candidates (e.g., 5)" /><br /><br />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function renderForm() {
+      const agent = document.getElementById("agentSelect").value;
+      const uploadArea = document.getElementById("uploadArea");
+      const userInput = document.getElementById("userInput");
+
+      if (agent === "resume") {
+        uploadArea.style.display = "block";
+        userInput.style.display = "none";
+      } else {
+        uploadArea.style.display = "none";
+        userInput.style.display = "block";
+      }
+    }
+
+    async function sendMessage() {
+      const agent = document.getElementById("agentSelect").value;
+      const userInputValue = document.getElementById("userInput").value.trim();
+      const chatLog = document.getElementById("chatLog");
+
+      if (!userInputValue && agent !== "resume") {
+        chatLog.innerHTML += `<div class="bot-message">❌ Please enter a message!</div>`;
+        return;
+      }
+
+      chatLog.innerHTML += `<div class="user-message">${userInputValue}</div>`;
+
+      let url = `http://localhost:8000/${agent}`;
+      let formData = new FormData();
+
+      if (agent === "blog" || agent === "news" || agent === "podcast") {
+        formData.append("topic", userInputValue);
+        if (agent === "blog") {
+          formData.append("keywords", "");
+          formData.append("tone", "friendly");
+          formData.append("length", 1000);
+        }
+        if (agent === "podcast") {
+          formData.append("length_choice", 5);
+        }
+      } else if (agent === "resume") {
+        const jdFileInput = document.getElementById("jdFile");
+        const resumesFileInput = document.getElementById("resumesFile");
+        const topNInput = document.getElementById("topNCandidates");
+
+        if (!jdFileInput.files.length || !resumesFileInput.files.length) {
+          chatLog.innerHTML += `<div class="bot-message">❌ Please upload JD and at least one Resume!</div>`;
+          return;
+        }
+        if (!topNInput.value) {
+          chatLog.innerHTML += `<div class="bot-message">❌ Please enter number of top candidates!</div>`;
+          return;
+        }
+
+        // Upload JD
+        const jdFormData = new FormData();
+        jdFormData.append("file", jdFileInput.files[0]);
+        await fetch("http://localhost:8000/upload/", { method: "POST", body: jdFormData });
+
+        // Upload resumes
+        for (let i = 0; i < resumesFileInput.files.length; i++) {
+          const resumeFormData = new FormData();
+          resumeFormData.append("file", resumesFileInput.files[i]);
+          await fetch("http://localhost:8000/upload/", { method: "POST", body: resumeFormData });
+        }
+
+        formData.append("top_n", topNInput.value);
+      }
+
+      fetch(url, { method: "POST", body: formData })
+        .then(response => response.json())
+        .then(data => {
+          let botReply = `✅ ${data.message}`;
+
+          if (data.filename) {
+            botReply += `<br><a class="download-button" href="http://localhost:8000/download/${data.filename}" target="_blank" download>📥 Download ${data.filename}</a>`;
+          }
+          if (data.audio_file) {
+            botReply += `<br><a class="download-button" href="http://localhost:8000/download/${data.audio_file}" target="_blank" download>🎧 Download Podcast Audio</a>`;
+          }
+
+          chatLog.innerHTML += `<div class="bot-message">${botReply}</div>`;
+          chatLog.scrollTop = chatLog.scrollHeight;
+        })
+        .catch(error => {
+          chatLog.innerHTML += `<div class="bot-message">❌ Error: ${error}</div>`;
+          chatLog.scrollTop = chatLog.scrollHeight;
+        });
+
+      document.getElementById("userInput").value = "";
+    }
+
+    // 🎤 Microphone recording feature
+    let mediaRecorder;
+    let audioChunks = [];
+
+    function startRecording() {
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.start();
+          audioChunks = [];
+
+          mediaRecorder.addEventListener("dataavailable", event => {
+            audioChunks.push(event.data);
+          });
+
+          mediaRecorder.addEventListener("stop", () => {
+            const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+            const formData = new FormData();
+            formData.append("file", audioBlob, "recorded.wav");
+
+            fetch("http://localhost:8000/voicechat", {
+              method: "POST",
+              body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+              const chatLog = document.getElementById("chatLog");
+              chatLog.innerHTML += `<div class="user-message">🎤 ${data.question}</div>`;
+              chatLog.innerHTML += `<div class="bot-message">🤖 ${data.answer}</div>`;
+              chatLog.scrollTop = chatLog.scrollHeight;
+            })
+            .catch(error => {
+              const chatLog = document.getElementById("chatLog");
+              chatLog.innerHTML += `<div class="bot-message">❌ Mic Error: ${error}</div>`;
+            });
+          });
+
+          setTimeout(() => {
+            mediaRecorder.stop();
+          }, 5000); // Auto-stop after 5 seconds
+        })
+        .catch(error => {
+          alert("Microphone access denied or error: " + error);
+        });
+    }
+  </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Agent Chatbot Suite</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f0f4ff, #d9e4ff);
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+.header {
+  background: linear-gradient(90deg, #7f00ff, #e100ff);
+  padding: 50px 20px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2.8rem;
+  letter-spacing: 1px;
+}
+
+.header p {
+  margin-top: 12px;
+  font-weight: 300;
+  font-size: 1.2rem;
+}
+
+.chat-container {
+  max-width: 900px;
+  margin: 40px auto;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  box-shadow: 0 12px 45px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.agent-selector {
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.7);
+  gap: 15px;
+  border-bottom: 1px solid #ccc;
+}
+
+.agent-card {
+  flex: 1 1 180px;
+  padding: 20px;
+  text-align: center;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  background: #ffffffbb;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.agent-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.agent-card.active {
+  border-color: #8e44ad;
+  background: #f3e9ff;
+}
+
+.agent-card span {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.chat-log {
+  padding: 30px;
+  height: 440px;
+  overflow-y: auto;
+  border-bottom: 1px solid #ddd;
+}
+
+.chat-log div {
+  margin: 16px 0;
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.user-message {
+  text-align: right;
+  color: #2d3436;
+  background: #d0f0ff;
+  padding: 12px 18px;
+  border-radius: 20px 20px 0 20px;
+  display: inline-block;
+  max-width: 70%;
+}
+
+.bot-message {
+  text-align: left;
+  color: #4b2ecf;
+  background: #e9e2ff;
+  padding: 12px 18px;
+  border-radius: 20px 20px 20px 0;
+  display: inline-block;
+  max-width: 70%;
+}
+
+.typing-indicator {
+  font-style: italic;
+  color: #888;
+}
+
+.chat-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.6);
+  border-top: 1px solid #ddd;
+}
+
+.chat-controls select,
+.chat-controls input,
+.chat-controls button {
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.chat-controls input {
+  flex: 1;
+}
+
+.chat-controls button {
+  background: linear-gradient(145deg, #6c5ce7, #a29bfe);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
+  transition: background 0.3s ease;
+}
+
+.chat-controls button:hover {
+  background: linear-gradient(145deg, #5a4db3, #8c7ae6);
+}
+
+#uploadArea {
+  width: 100%;
+  margin-top: 15px;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  border: 2px dashed #b2bec3;
+  padding: 20px;
+  border-radius: 12px;
+  background: #f8f9fa;
+}
+
+.download-button {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 12px 18px;
+  background-color: #00cec9;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.download-button:hover {
+  background-color: #00b894;
+  transform: scale(1.05);
+}
+
+audio {
+  margin-top: 12px;
+  width: 100%;
+  max-width: 300px;
+  outline: none;
+  border-radius: 10px;
+}
+
+@media (max-width: 600px) {
+  .chat-controls {
+    flex-direction: column;
+  }
+
+  .chat-controls input,
+  .chat-controls button {
+    width: 100%;
+  }
+
+  .chat-log {
+    height: 360px;
+  }
+
+  .chat-container {
+    margin: 20px 10px;
+  }
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1>Agent Suite 🤖</h1>
+    <p>Select your agent and get started</p>
+  </div>
+
+  <div class="chat-container">
+    <div class="agent-selector" id="agentSelector">
+      <div class="agent-card active" data-agent="podcast"><span>🎙️</span>Podcast</div>
+      <div class="agent-card" data-agent="blog"><span>📝</span>Blog</div>
+      <div class="agent-card" data-agent="resume"><span>📄</span>Resume</div>
+      <div class="agent-card" data-agent="news"><span>🗞️</span>News</div>
+    </div>
+
+    <div class="chat-log" id="chatLog">
+      <div class="bot-message">👋 Hi! I'm your AI Agent. Select an agent and complete your task, or click Mic 🎤 to talk!</div>
+    </div>
+
+    <div class="chat-controls">
+      <input type="text" id="userInput" placeholder="Type your message..." />
+      <button onclick="sendMessage()">Send</button>
+      <button onclick="startRecording()">🎤 Mic</button>
+
+      <div id="uploadArea">
+        <strong>Upload JD and Resumes</strong>
+        <input type="file" id="jdFile" accept=".txt" />
+        <input type="file" id="resumesFile" accept=".pdf" multiple />
+        <input type="number" id="topNCandidates" placeholder="Top candidates (e.g., 5)" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedAgent = 'podcast';
+
+    document.querySelectorAll('.agent-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        selectedAgent = card.getAttribute('data-agent');
+        renderForm();
+      });
+    });
+
+    function renderForm() {
+      const uploadArea = document.getElementById("uploadArea");
+      const userInput = document.getElementById("userInput");
+
+      if (selectedAgent === "resume") {
+        uploadArea.style.display = "flex";
+        userInput.style.display = "none";
+      } else {
+        uploadArea.style.display = "none";
+        userInput.style.display = "block";
+      }
+    }
+
+    async function sendMessage() {
+      const chatLog = document.getElementById("chatLog");
+      const userInputValue = document.getElementById("userInput").value.trim();
+
+      if (!userInputValue && selectedAgent !== "resume") {
+        chatLog.innerHTML += `<div class="bot-message">❌ Please enter a message!</div>`;
+        return;
+      }
+
+      if (selectedAgent !== "resume") {
+        chatLog.innerHTML += `<div class="user-message">${userInputValue}</div>`;
+        chatLog.innerHTML += `<div class="bot-message typing-indicator" id="typing">🤖 Typing...</div>`;
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+
+      let url = `http://localhost:8000/${selectedAgent}`;
+      let formData = new FormData();
+
+      if (selectedAgent === "blog" || selectedAgent === "news" || selectedAgent === "podcast") {
+        formData.append("topic", userInputValue);
+        if (selectedAgent === "blog") {
+          formData.append("keywords", "");
+          formData.append("tone", "friendly");
+          formData.append("length", 1000);
+        }
+        if (selectedAgent === "podcast") {
+          formData.append("length_choice", 5);
+        }
+      } else if (selectedAgent === "resume") {
+        const jdFileInput = document.getElementById("jdFile");
+        const resumesFileInput = document.getElementById("resumesFile");
+        const topNInput = document.getElementById("topNCandidates");
+
+        if (!jdFileInput.files.length || !resumesFileInput.files.length) {
+          chatLog.innerHTML += `<div class="bot-message">❌ Please upload JD and at least one Resume!</div>`;
+          return;
+        }
+        if (!topNInput.value) {
+          chatLog.innerHTML += `<div class="bot-message">❌ Please enter number of top candidates!</div>`;
+          return;
+        }
+
+        const jdFormData = new FormData();
+        jdFormData.append("file", jdFileInput.files[0]);
+        await fetch("http://localhost:8000/upload/", { method: "POST", body: jdFormData });
+
+        for (let i = 0; i < resumesFileInput.files.length; i++) {
+          const resumeFormData = new FormData();
+          resumeFormData.append("file", resumesFileInput.files[i]);
+          await fetch("http://localhost:8000/upload/", { method: "POST", body: resumeFormData });
+        }
+
+        formData.append("top_n", topNInput.value);
+      }
+
+      fetch(url, { method: "POST", body: formData })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById("typing")?.remove();
+          let botReply = `✅ ${data.message}`;
+
+          if (data.filename) {
+            botReply += `<br><a class="download-button" href="http://localhost:8000/download/${data.filename}" target="_blank" download>📥 Download ${data.filename}</a>`;
+          }
+          if (data.audio_file) {
+            botReply += `<br><a class="download-button" href="http://localhost:8000/download/${data.audio_file}" target="_blank" download>🎧 Download Audio</a>`;
+            botReply += `<br><audio controls src="http://localhost:8000/download/${data.audio_file}"></audio>`;
+          }
+
+          chatLog.innerHTML += `<div class="bot-message">${botReply}</div>`;
+          chatLog.scrollTop = chatLog.scrollHeight;
+        })
+        .catch(error => {
+          document.getElementById("typing")?.remove();
+          chatLog.innerHTML += `<div class="bot-message">❌ Error: ${error}</div>`;
+        });
+
+      document.getElementById("userInput").value = "";
+    }
+
+    let mediaRecorder;
+    let audioChunks = [];
+
+    function startRecording() {
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.start();
+          audioChunks = [];
+
+          mediaRecorder.addEventListener("dataavailable", event => {
+            audioChunks.push(event.data);
+          });
+
+          mediaRecorder.addEventListener("stop", () => {
+            const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+            const formData = new FormData();
+            formData.append("file", audioBlob, "recorded.wav");
+
+            fetch("http://localhost:8000/voicechat", {
+              method: "POST",
+              body: formData
+            })
+              .then(response => response.json())
+              .then(data => {
+                const chatLog = document.getElementById("chatLog");
+                chatLog.innerHTML += `<div class="user-message">🎤 ${data.question}</div>`;
+                chatLog.innerHTML += `<div class="bot-message">🤖 ${data.answer}</div>`;
+                chatLog.scrollTop = chatLog.scrollHeight;
+              })
+              .catch(error => {
+                chatLog.innerHTML += `<div class="bot-message">❌ Mic Error: ${error}</div>`;
+              });
+          });
+
+          setTimeout(() => {
+            mediaRecorder.stop();
+          }, 5000);
         })
         .catch(error => {
           alert("Microphone access denied or error: " + error);

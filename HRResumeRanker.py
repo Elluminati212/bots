@@ -5,7 +5,7 @@ import requests
 import pandas as pd
 
 # CONFIG
-GROQ_API_KEY = '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'
+GROQ_API_KEY = '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'
 GROQ_MODEL = 'llama3-70b-8192'
 GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 
@@ -70,15 +70,6 @@ Only include the top {top_n} candidates in the final result.
         print(f"Error querying Groq LLM: {response.status_code}, {response.text}")
         return None
 
-# def load_resumes_from_folder(folder_path):
-#     resumes = []
-#     for filename in os.listdir(folder_path):
-#         if filename.endswith(".txt"):
-#             with open(os.path.join(folder_path, filename), 'r', encoding='utf-8') as f:
-#                 resumes.append(f.read())
-#     return resumes
-
-
 def load_resumes_from_folder(folder_path):
     resumes = []
     for filename in os.listdir(folder_path):
@@ -105,45 +96,12 @@ def save_results_to_file(result_text, filename):
         f.write(result_text)
     print(f"✅ Results saved to: {filename}")
 
-# def main():
-#     print("🤝 Welcome to the HR Resume Ranker Agent!")
-    
-#     jd_file = input("Enter the path to the Job Description file (txt): ").strip()
-#     resumes_folder = input("Enter the path to the folder containing resumes (txt files): ").strip()
-#     top_n = int(input("How many top candidates to shortlist? (e.g., 5, 10): ").strip())
-
-#     if not os.path.exists(jd_file):
-#         print("❌ Job Description file not found.")
-#         return
-#     if not os.path.isdir(resumes_folder):
-#         print("❌ Resumes folder not found.")
-#         return
-
-#     with open(jd_file, 'r', encoding='utf-8') as f:
-#         jd = f.read()
-
-#     resumes = load_resumes_from_folder(resumes_folder)
-
-#     if not resumes:
-#         print("❌ No resumes found in the provided folder.")
-#         return
-
-#     result_text = query_groq_llm(jd, resumes, top_n)
-
-#     if result_text:
-#         output_file = "Ranked_Candidates_Report.txt"
-#         save_results_to_file(result_text, output_file)
-
-#         print("\n🏆 Ranking complete! Check the 'Ranked_Candidates_Report.txt' file for results.")
-#     else:
-#         print("❌ Failed to analyze resumes. Please try again.")
-
 def main(top_n):
     print("🤝 Welcome to the HR Resume Ranker Agent!")
 
     # Predefined paths
-    jd_path = "/home/vasu/bots/uploads/job_description.txt"
-    resumes_folder = "/home/vasu/bots/uploads/"
+    jd_path = "/home/elluminati/bots/uploads/job_description.txt"
+    resumes_folder = "/home/elluminati/bots/uploads/"
 
     if not os.path.exists(jd_path):
         print(f"❌ Job Description file not found at {jd_path}")
@@ -165,7 +123,7 @@ def main(top_n):
     result_text = query_groq_llm(jd, resumes, top_n)
 
     if result_text:
-        output_file = "/home/vasu/bots/results/Ranked_Candidates_Report.txt"
+        output_file = "/home/elluminati/bots/results/Ranked_Candidates_Report.txt"
         save_results_to_file(result_text, output_file)
         print("\n🏆 Ranking complete! Check the 'Ranked_Candidates_Report.txt' file for results.")
     else:
@@ -173,5 +131,10 @@ def main(top_n):
 
 
 
+# if __name__ == "__main__":
+    # main()
+    
+    
 if __name__ == "__main__":
-    main()
+    top_n = int(input("How many top candidates to shortlist? (e.g., 5, 10): ").strip())
+    main(top_n)

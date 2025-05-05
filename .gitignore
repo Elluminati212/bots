@@ -1,0 +1,10 @@
+Data/
+cache/
+__pycache__/
+.venv/
+audio/
+audio_cache/
+faiss_index/
+output/
+results/
+upload/
