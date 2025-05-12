@@ -124,7 +124,7 @@ import requests
 import fitz  # PyMuPDF for PDFs
 
 # CONFIG
-GROQ_API_KEY = 'your_groq_api_key_here'  # <<< Replace with your Groq API key
+GROQ_API_KEY = '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'  # <<< Replace with your Groq API key
 GROQ_MODEL = 'llama3-70b-8192'
 GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 

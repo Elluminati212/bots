@@ -5,7 +5,7 @@ import requests
 import pandas as pd
 
 # CONFIG
-GROQ_API_KEY = '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'
+GROQ_API_KEY = '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'
 GROQ_MODEL = 'llama3-70b-8192'
 GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 

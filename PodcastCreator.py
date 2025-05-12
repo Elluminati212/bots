@@ -5,7 +5,7 @@ from gtts import gTTS
 from pydub import AudioSegment  # To convert mp3 to wav if needed
 
 # CONFIG
-GROQ_API_KEY = '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'
+GROQ_API_KEY = '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'
 GROQ_MODEL = 'llama3-70b-8192'
 GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 
